@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-0">
+    <div class="col-md-5 p-4 bg-white shadow-sm h-100">
+        <h4 class="fw-bold text-success mb-3">Register New Asset</h4>
+        <form method="POST">
+            <div class="mb-2">
+                <label class="small fw-bold">Company</label>
+                <select id="in_comp" name="company" class="form-select form-select-sm">
+                    <option>Coolaire Consolidated Inc.</option>
+                    <option>SE Coldtech Supply Inc.</option>
+                    <option>South Industrial Trade</option>
+                    <option>Snowking</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label class="small fw-bold">Control #</label>
+                <input type="text" name="control_num" class="form-control form-control-sm" placeholder="CTRL-2026-001">
+            </div>
+            <div class="mb-2">
+                <label class="small fw-bold">Asset Code (QR)</label>
+                <input type="text" id="in_qr" name="qr_code" class="form-control form-control-sm" required autofocus>
+            </div>
+            <div class="mb-2">
+                <label class="small fw-bold">Issued To</label>
+                <input type="text" id="in_to" name="issued_to" class="form-control form-control-sm">
+            </div>
+            <div class="mb-2">
+                <label class="small fw-bold">Purchase Date</label>
+                <input type="date" id="in_date" name="purchase_date" class="form-control form-control-sm" value="{{ today }}">
+            </div>
+            <div class="mb-2">
+                <label class="small fw-bold">Description</label>
+                <textarea name="description" class="form-control form-control-sm" rows="2"></textarea>
+            </div>
+            <button type="submit" class="btn btn-success w-100 fw-bold py-2 mt-3">SAVE ASSET</button>
+            <button type="button" onclick="window.print()" class="btn btn-dark w-100 mt-2">PRINT LABEL</button>
+        </form>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="col-md-7 d-flex flex-column align-items-center bg-light pt-5">
+        <div class="preview-scale">
+            <div id="printableLabel" class="label-sticker">
+                <div class="st-qr-box"><div id="qr_canvas"></div></div>
+                <div class="st-logo-box"><img id="pr_logo" src="/static/logos/coolaire.png"></div>
+
+                <div class="st-brand-middle" id="pr_name">Coolaire</div>
+
+                <div class="st-asset-id-small" id="pr_qr">---</div>
+
+                <div class="st-meta-right">
+                    Date: <b id="pr_date">{{ today_str }}</b><br>
+                    To: <b id="pr_to">Available</b>
+                </div>
+
+                <div class="st-footer-center">www.coolaireconsolidated.com</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    const qr = new QRCode(document.getElementById("qr_canvas"), { width: 100, height: 100 });
+    function update() {
+        const qv = document.getElementById('in_qr').value.toUpperCase();
+        const co = document.getElementById('in_comp').value;
+        const to = document.getElementById('in_to').value || "Available";
+        const dt = document.getElementById('in_date').value;
+
+        document.getElementById('pr_qr').innerText = qv || "---";
+        document.getElementById('pr_to').innerText = to;
+        if(dt) { const p = dt.split("-"); document.getElementById('pr_date').innerText = `${p[1]}/${p[2]}/${p[0]}`; }
+        qr.makeCode(qv || " ");
+
+        const name = document.getElementById('pr_name');
+        const logo = document.getElementById('pr_logo');
+        if(co.includes("Coolaire")) { name.innerText="Coolaire"; logo.src="/static/logos/coolaire.png"; }
+        else if(co.includes("SE")) { name.innerText="SE"; logo.src="/static/logos/secoldtech.png"; }
+        else if(co.includes("South")) { name.innerText="SIT"; logo.src="/static/logos/south.png"; }
+        else { name.innerText="SK"; logo.src="/static/logos/snowking.png"; }
+    }
+    document.querySelectorAll('input, select').forEach(i => i.addEventListener('input', update));
+    update();
+</script>
+{% endblock %}

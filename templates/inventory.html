@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Asset Inventory</h2>
+<div class="card p-4 bg-white">
+    <table id="assetTable" class="table table-hover">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Status</th>
+                <th>Description</th>
+                <th>Issued To</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in assets %}
+            <tr>
+                <td><b>{{ a.qr_asset_code }}</b></td>
+                <td><span class="badge {{ 'bg-success' if a.status == 'Available' else 'bg-info' }}">{{ a.status }}</span></td>
+                <td>{{ a.item_description }}</td>
+                <td>{{ a.issued_to or '--' }}</td>
+                <td><a href="/asset/{{ a.id }}" class="btn btn-sm btn-outline-primary">Manage</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+<script>$(document).ready( function () { $('#assetTable').DataTable(); } );</script>
+{% endblock %}

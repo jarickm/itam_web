@@ -1,0 +1,33 @@
+<!-- Inside templates/view_asset.html -->
+<div class="sticker-preview-container" style="height: 250px;">
+    <div id="printableLabel" class="label-sticker">
+
+        <!-- 1. QR Code and Asset ID (Left) -->
+        <div class="sticker-qr-group">
+            <img src="data:image/png;base64,{{ qr_img }}" class="sticker-qr-img">
+            <div class="sticker-asset-id">{{ asset.qr_asset_code }}</div>
+        </div>
+
+        <!-- 2. Branding Text (Center) -->
+        <div class="sticker-branding">
+            <div class="text-prop">Property of</div>
+            <div class="text-coolaire">Coolaire</div>
+            <div class="text-call-msg">in case of lost<br>please call</div>
+            <div class="text-phones">+63283728876<br>+63283728882</div>
+        </div>
+
+        <!-- 3. Logos (Right) -->
+        <!-- Note: Ensure these images exist in your static/logos folder -->
+        <img src="{{ url_for('static', filename='logos/coolaire_swirl.png') }}" class="sticker-logo-swirl">
+        <img src="{{ url_for('static', filename='logos/coolaire_text.png') }}" class="sticker-logo-text">
+
+        <!-- 4. Metadata (Purchase & Custodian) -->
+        <div class="sticker-meta">
+            <div>Date Purchase: <b>{{ asset.date_purchase.strftime('%m/%d/%Y') if asset.date_purchase else '' }}</b></div>
+            <div>Custodian: <b>{{ asset.issued_to or '' }}</b></div>
+        </div>
+
+        <!-- 5. Website (Bottom) -->
+        <div class="sticker-footer-web">www.coolaireconsolidated.com</div>
+    </div>
+</div>

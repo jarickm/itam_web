@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-0">
+    <!-- FORM SIDE -->
+    <div class="col-md-5 p-4 bg-white border-end h-100">
+        <h4 class="fw-bold text-success mb-4">Asset Entry</h4>
+        <form method="POST">
+            <div class="mb-3">
+                <label class="small fw-bold">Company</label>
+                <select id="in_comp" name="company" class="form-select">
+                    <option>Coolaire Consolidated Inc.</option>
+                    <option>SE Coldtech Supply Inc.</option>
+                    <option>South Industrial Trade</option>
+                    <option>Snowking</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="small fw-bold">Asset Code (QR)</label>
+                <input type="text" id="in_qr" name="qr_code" class="form-control text-uppercase" placeholder="1AITOE..." required>
+            </div>
+            <div class="mb-3">
+                <label class="small fw-bold">Custodian</label>
+                <input type="text" id="in_to" name="issued_to" class="form-control" placeholder="Employee Name">
+            </div>
+            <div class="mb-3">
+                <label class="small fw-bold">Purchase Date</label>
+                <input type="date" id="in_date" name="purchase_date" class="form-control" value="{{ today }}">
+            </div>
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success fw-bold p-3">SAVE TO DATABASE</button>
+                <button type="button" onclick="window.print()" class="btn btn-dark fw-bold">PRINT STICKER</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- PREVIEW SIDE -->
+    <div class="col-md-7 d-flex flex-column align-items-center justify-content-start bg-light pt-5">
+        <div class="preview-scale">
+            <div id="printableLabel" class="label-sticker">
+
+                <!-- 1. QR CODE -->
+                <div class="st-qr"><div id="qr_canvas"></div></div>
+
+                <!-- 2. ASSET CODE (Under QR) -->
+                <div id="pr_qr" class="st-asset-id">---</div>
+
+                <!-- 3. BRANDING & CONTACT -->
+                <div class="st-branding-center">
+                    <div class="st-prop-of">Property of</div>
+                    <div id="pr_name" class="st-brand-name">Coolaire</div>
+                    <div class="st-lost-call">in case of lost please call</div>
+                    <div class="st-phones">+63283728876<br>+63283728882</div>
+                </div>
+
+                <!-- 4. LOGO (Top Right) -->
+                <div class="st-logo-top-right">
+                    <img id="pr_logo" src="/static/logos/coolaire.png">
+                </div>
+
+                <!-- 5. METADATA (Bottom Right) -->
+                <div class="st-meta-bottom">
+                    Date Purchase: <b id="pr_date">{{ today_str }}</b><br>
+                    Custodian: <b id="pr_to">Available</b>
+                </div>
+
+                <!-- 6. WEBSITE (Bottom Center) -->
+                <div class="st-website">www.coolaireconsolidated.com</div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    const qr = new QRCode(document.getElementById("qr_canvas"), { width: 100, height: 100 });
+    function update() {
+        const qv = document.getElementById('in_qr').value.toUpperCase();
+        const co = document.getElementById('in_comp').value;
+        const to = document.getElementById('in_to').value || "Available";
+        const dt = document.getElementById('in_date').value;
+
+        document.getElementById('pr_qr').innerText = qv || "---";
+        document.getElementById('pr_to').innerText = to;
+        if(dt) { const p = dt.split("-"); document.getElementById('pr_date').innerText = `${p[1]}/${p[2]}/${p[0]}`; }
+
+        qr.makeCode(qv || " ");
+
+        const name = document.getElementById('pr_name');
+        const logo = document.getElementById('pr_logo');
+        if(co.includes("Coolaire")) { name.innerText="Coolaire"; logo.src="/static/logos/coolaire.png"; }
+        else if(co.includes("SE")) { name.innerText="SE"; logo.src="/static/logos/secoldtech.png"; }
+        else if(co.includes("South")) { name.innerText="SIT"; logo.src="/static/logos/south.png"; }
+        else { name.innerText="SK"; logo.src="/static/logos/snowking.png"; }
+    }
+    document.querySelectorAll('input, select').forEach(i => i.addEventListener('input', update));
+    update();
+</script>
+{% endblock %}

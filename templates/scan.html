@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+    <div class="card p-4 shadow-sm border-0 mb-4 bg-success text-white">
+        <h3>Quick Scan Mode</h3>
+        <p class="mb-0 small">Keep browser window active. Zebra scanner will automatically type here.</p>
+    </div>
+
+    <input type="text" id="scanInput" class="form-control form-control-lg mb-4 border-success shadow-sm" placeholder="Ready for Scan..." autofocus>
+
+    <div class="row" id="resultCard" style="display:none">
+        <div class="col-md-8">
+            <div class="card p-4 border-0 shadow-sm">
+                <h4 id="res_qr" class="fw-bold text-success"></h4>
+                <hr>
+                <p><b>Description:</b> <span id="res_desc"></span></p>
+                <p><b>Current Status:</b> <span id="res_stat" class="badge bg-primary"></span></p>
+                <p><b>Issued To:</b> <span id="res_to"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('scanInput');
+    document.addEventListener('click', () => input.focus());
+
+    input.addEventListener('keypress', async (e) => {
+        if (e.key === 'Enter') {
+            const code = input.value.split('|')[0];
+            const res = await fetch(`/api/asset/${code}`);
+            const data = await res.json();
+            if(data.success) {
+                document.getElementById('resultCard').style.display = 'flex';
+                document.getElementById('res_qr').innerText = data.qr;
+                document.getElementById('res_desc').innerText = data.desc;
+                document.getElementById('res_stat').innerText = data.status;
+                document.getElementById('res_to').innerText = data.issued_to;
+            }
+            input.value = '';
+        }
+    });
+</script>
+{% endblock %}
